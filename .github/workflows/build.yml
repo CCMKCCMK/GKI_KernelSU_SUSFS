@@ -241,6 +241,14 @@ jobs:
         flavor: ${{ inputs.root_flavor }}
         commit: ${{ inputs.root_commit }}
 
+    - name: Fix KSU-Next samsung_kdp missing include
+      shell: bash
+      run: |
+        F="${{ github.workspace }}/kernel/common/drivers/kernelsu/compat/samsung_kdp.c"
+        if [ -f "$F" ] && ! grep -q "linux/sched.h" "$F"; then
+          sed -i '1i #include <linux/sched.h>' "$F"
+          echo "patched samsung_kdp.c with sched.h include"
+        fi
     - name: Mark No Root build metadata
       if: inputs.root_flavor == 'none'
       shell: bash
